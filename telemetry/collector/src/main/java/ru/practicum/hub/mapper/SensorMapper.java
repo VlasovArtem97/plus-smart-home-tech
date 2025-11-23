@@ -27,25 +27,30 @@ public interface SensorMapper {
     @Mapping(source = "event", target = "payload", qualifiedByName = "climateSensorEventToAvro")
     @Mapping(source = "hubId", target = "hubId")
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "timestamp", target = "timestamp")
     SensorEventAvro toSensorEventAvroFromClimateSensorEvent(ClimateSensorEvent event);
 
     @Mapping(source = "event", target = "payload", qualifiedByName = "lightSensorEventToAvro")
     @Mapping(source = "hubId", target = "hubId")
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "timestamp", target = "timestamp")
     SensorEventAvro toSensorEventAvroFromLightSensorEvent(LightSensorEvent event);
 
     @Mapping(source = "event", target = "payload", qualifiedByName = "motionSensorEventToAvro")
     @Mapping(source = "hubId", target = "hubId")
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "timestamp", target = "timestamp")
     SensorEventAvro toSensorEventAvroFromMotionSensorEvent(MotionSensorEvent event);
 
     @Mapping(source = "event", target = "payload", qualifiedByName = "switchSensorEventToAvro")
     @Mapping(source = "hubId", target = "hubId")
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "timestamp", target = "timestamp")
     SensorEventAvro toSensorEventAvroFromSwitchSensorEvent(SwitchSensorEvent event);
 
     @Mapping(source = "event", target = "payload", qualifiedByName = "temperatureSensorEventToAvro")
     @Mapping(source = "hubId", target = "hubId")
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "timestamp", target = "timestamp")
     SensorEventAvro toSensorEventAvroFromTemperatureSensorEvent(TemperatureSensorEvent event);
 }
