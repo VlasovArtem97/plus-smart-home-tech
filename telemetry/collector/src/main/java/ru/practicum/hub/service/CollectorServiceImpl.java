@@ -24,10 +24,10 @@ public class CollectorServiceImpl implements CollectorService {
     private Producer<String, SpecificRecordBase> producer;
 
     @Value("${kafka.topicSensor}")
-    private final String topicSensor;
+    private String topicSensor;
 
     @Value("${kafka.topicHub}")
-    private final String topicHub;
+    private String topicHub;
 
     private final HubMapper hubMapper;
 

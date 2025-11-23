@@ -11,7 +11,7 @@ import ru.practicum.hub.model.sensors.SensorEvent;
 import ru.practicum.hub.service.CollectorService;
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping(path = "/events")
 @Validated
 @RequiredArgsConstructor
 @Slf4j
