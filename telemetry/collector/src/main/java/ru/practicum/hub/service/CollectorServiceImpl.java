@@ -55,11 +55,13 @@ public class CollectorServiceImpl implements CollectorService {
                     sensorMapper.toSensorEventAvroFromMotionSensorEvent((MotionSensorEvent) sensorEvent));
             case TEMPERATURE_SENSOR_EVENT -> record = new ProducerRecord<>(topicSensor,
                     sensorMapper.toSensorEventAvroFromTemperatureSensorEvent((TemperatureSensorEvent) sensorEvent));
+            default -> {
+                log.error("Неизвестный тип sensorEvent: {}", sensorEvent.getType());
+                throw new IllegalStateException("Неизвестный тип: " + sensorEvent.getType());
+            }
         }
-        if (record != null) {
-            log.info("Отправка сенсорных данных: тип {} в топик {}", sensorEvent.getType(), topicSensor);
-            sendMessageTopic(record, "SensorEvent");
-        }
+        log.debug("Отправка сенсорных данных: тип {} в топик {}", sensorEvent.getType(), topicSensor);
+        sendMessageTopic(record, "SensorEvent");
     }
 
     @Override
@@ -76,11 +78,13 @@ public class CollectorServiceImpl implements CollectorService {
                     hubMapper.toHubEventAvroFromScenarioAddedEvent((ScenarioAddedEvent) hubEvent));
             case SCENARIO_REMOVED -> record = new ProducerRecord<>(topicHub,
                     hubMapper.toHubEventAvroFromScenarioRemovedEvent((ScenarioRemovedEvent) hubEvent));
+            default -> {
+                log.error("Неизвестный тип hubEvent: {}", hubEvent.getType());
+                throw new IllegalStateException("Неизвестный тип: " + hubEvent.getType());
+            }
         }
-        if (record != null) {
-            log.info("Отправка данных хаба: тип {} в топик {}", hubEvent.getType(), topicHub);
-            sendMessageTopic(record, "hubEvent");
-        }
+        log.debug("Отправка данных хаба: тип {} в топик {}", hubEvent.getType(), topicHub);
+        sendMessageTopic(record, "hubEvent");
     }
 
     private void sendMessageTopic(ProducerRecord<String, SpecificRecordBase> record, String typeEvent) {

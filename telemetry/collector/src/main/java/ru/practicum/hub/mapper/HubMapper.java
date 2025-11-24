@@ -1,6 +1,8 @@
 package ru.practicum.hub.mapper;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import ru.practicum.hub.model.hubs.DeviceAddedEvent;
 import ru.practicum.hub.model.hubs.DeviceRemovedEvent;
 import ru.practicum.hub.model.hubs.ScenarioAddedEvent;

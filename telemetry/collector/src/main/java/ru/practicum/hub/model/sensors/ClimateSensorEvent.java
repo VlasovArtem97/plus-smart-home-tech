@@ -1,7 +1,6 @@
 package ru.practicum.hub.model.sensors;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import ru.practicum.hub.model.sensors.senserenum.SensorEventType;
@@ -15,15 +14,12 @@ import ru.practicum.hub.model.sensors.senserenum.SensorEventType;
 @ToString(callSuper = true)
 public class ClimateSensorEvent extends SensorEvent {
 
-//    @PositiveOrZero
     @NotNull
     private Integer temperatureC;
 
-//    @PositiveOrZero
     @NotNull
     private Integer humidity;
 
-//    @PositiveOrZero
     @NotNull
     private Integer co2Level;
 

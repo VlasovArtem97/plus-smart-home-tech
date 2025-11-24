@@ -1,7 +1,6 @@
 package ru.practicum.hub.model.sensors;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import ru.practicum.hub.model.sensors.senserenum.SensorEventType;
@@ -15,12 +14,10 @@ import ru.practicum.hub.model.sensors.senserenum.SensorEventType;
 @ToString(callSuper = true)
 public class TemperatureSensorEvent extends SensorEvent {
 
-    @Min(-50)
-    @Max(50)
+    @Size(min = -50, max = 50)
     private int temperatureC;
 
-    @Min(-58)
-    @Max(122)
+    @Size(min = -58, max = 122)
     private int temperatureF;
 
     @Override
