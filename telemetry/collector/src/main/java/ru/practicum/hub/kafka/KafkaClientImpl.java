@@ -9,10 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.practicum.avroserialization.AvroSerialization;
 
+import java.time.Duration;
 import java.util.Properties;
 
 @Component
-public class KafkaClientImpl implements KafkaClient {
+public class KafkaClientImpl implements KafkaClient, AutoCloseable {
 
     @Value("${kafka.port}")
     private String kafkaPort;
@@ -33,5 +34,14 @@ public class KafkaClientImpl implements KafkaClient {
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, VoidSerializer.class.getName());
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroSerialization.class.getName());
         producer = new KafkaProducer<>(config);
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (producer != null) {
+            producer.flush();
+            producer.close(Duration.ofSeconds(10));
+            producer = null;
+        }
     }
 }

@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.hub.model.hubs.HubEvent;
 import ru.practicum.hub.model.sensors.SensorEvent;
@@ -12,7 +11,6 @@ import ru.practicum.hub.service.CollectorService;
 
 @RestController
 @RequestMapping(path = "/events")
-@Validated
 @RequiredArgsConstructor
 @Slf4j
 public class CollectorController {

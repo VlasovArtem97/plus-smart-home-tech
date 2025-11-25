@@ -1,6 +1,5 @@
 package ru.practicum.hub.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
@@ -21,8 +20,6 @@ public class CollectorServiceImpl implements CollectorService {
 
     private final KafkaClientImpl kafkaClient;
 
-    private Producer<String, SpecificRecordBase> producer;
-
     @Value("${kafka.topicSensor}")
     private String topicSensor;
 
@@ -32,12 +29,6 @@ public class CollectorServiceImpl implements CollectorService {
     private final HubMapper hubMapper;
 
     private final SensorMapper sensorMapper;
-
-    @PostConstruct
-    public void init() {
-        this.producer = kafkaClient.getProducer();
-        log.info("Kafka Producer инициализирован");
-    }
 
     @Override
     public void addSensors(SensorEvent sensorEvent) {
@@ -89,6 +80,7 @@ public class CollectorServiceImpl implements CollectorService {
 
     private void sendMessageTopic(ProducerRecord<String, SpecificRecordBase> record, String typeEvent) {
         try {
+            Producer<String, SpecificRecordBase> producer = kafkaClient.getProducer();
             producer.send(record, (metadata, exception) -> {
                 if (exception != null) {
                     log.error("Не удалось отправить {}: {}", typeEvent, exception.getMessage());
@@ -96,6 +88,7 @@ public class CollectorServiceImpl implements CollectorService {
                     log.info("{} успешно отправлены в партицию {} с смещением {}", typeEvent, metadata.partition(), metadata.offset());
                 }
             });
+            kafkaClient.close();
         } catch (Exception e) {
             log.error("Ошибка при отправке {}", typeEvent, e);
         }
