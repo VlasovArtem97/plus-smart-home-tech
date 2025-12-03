@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "telemetry/messages/sensor_event.proto";
 import "telemetry/messages/hub_event.proto";
-import "google/protobuf/Empty.proto";
+import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option java_package = "ru.yandex.practicum.grpc.telemetry.collector";
