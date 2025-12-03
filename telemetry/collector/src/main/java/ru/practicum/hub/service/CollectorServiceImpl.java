@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.hub.kafka.KafkaClientImpl;
 import ru.practicum.hub.mapper.HubMapper;
 import ru.practicum.hub.mapper.SensorMapper;
-import ru.practicum.hub.model.hubs.*;
-import ru.practicum.hub.model.sensors.*;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
+import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 
 @Service
 @Slf4j
@@ -31,50 +33,18 @@ public class CollectorServiceImpl implements CollectorService {
     private final SensorMapper sensorMapper;
 
     @Override
-    public void addSensors(SensorEvent sensorEvent) {
-
-        ProducerRecord<String, SpecificRecordBase> record = null;
-
-        switch (sensorEvent.getType()) {
-            case SWITCH_SENSOR_EVENT -> record = new ProducerRecord<>(topicSensor,
-                    sensorMapper.toSensorEventAvroFromSwitchSensorEvent((SwitchSensorEvent) sensorEvent));
-            case CLIMATE_SENSOR_EVENT -> record = new ProducerRecord<>(topicSensor,
-                    sensorMapper.toSensorEventAvroFromClimateSensorEvent((ClimateSensorEvent) sensorEvent));
-            case LIGHT_SENSOR_EVENT -> record = new ProducerRecord<>(topicSensor,
-                    sensorMapper.toSensorEventAvroFromLightSensorEvent((LightSensorEvent) sensorEvent));
-            case MOTION_SENSOR_EVENT -> record = new ProducerRecord<>(topicSensor,
-                    sensorMapper.toSensorEventAvroFromMotionSensorEvent((MotionSensorEvent) sensorEvent));
-            case TEMPERATURE_SENSOR_EVENT -> record = new ProducerRecord<>(topicSensor,
-                    sensorMapper.toSensorEventAvroFromTemperatureSensorEvent((TemperatureSensorEvent) sensorEvent));
-            default -> {
-                log.error("Неизвестный тип sensorEvent: {}", sensorEvent.getType());
-                throw new IllegalStateException("Неизвестный тип: " + sensorEvent.getType());
-            }
-        }
-        log.debug("Отправка сенсорных данных: тип {} в топик {}", sensorEvent.getType(), topicSensor);
+    public void addSensors(SensorEventProto sensorEvent) {
+        SensorEventAvro sensorEventAvro = sensorMapper.toSensorEventAvroFromSensorEventProto(sensorEvent);
+        ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(topicSensor, sensorEventAvro);
+        log.debug("Отправка сенсорных данных: тип {} в топик {}", sensorEvent.getPayloadCase(), topicSensor);
         sendMessageTopic(record, "SensorEvent");
     }
 
     @Override
-    public void addHubs(HubEvent hubEvent) {
-
-        ProducerRecord<String, SpecificRecordBase> record = null;
-
-        switch (hubEvent.getType()) {
-            case DEVICE_ADDED -> record = new ProducerRecord<>(topicHub,
-                    hubMapper.toHubEventAvroFromDeviceAddedEvent((DeviceAddedEvent) hubEvent));
-            case DEVICE_REMOVED -> record = new ProducerRecord<>(topicHub,
-                    hubMapper.toHubEventAvroFromDeviceRemovedEvent((DeviceRemovedEvent) hubEvent));
-            case SCENARIO_ADDED -> record = new ProducerRecord<>(topicHub,
-                    hubMapper.toHubEventAvroFromScenarioAddedEvent((ScenarioAddedEvent) hubEvent));
-            case SCENARIO_REMOVED -> record = new ProducerRecord<>(topicHub,
-                    hubMapper.toHubEventAvroFromScenarioRemovedEvent((ScenarioRemovedEvent) hubEvent));
-            default -> {
-                log.error("Неизвестный тип hubEvent: {}", hubEvent.getType());
-                throw new IllegalStateException("Неизвестный тип: " + hubEvent.getType());
-            }
-        }
-        log.debug("Отправка данных хаба: тип {} в топик {}", hubEvent.getType(), topicHub);
+    public void addHubs(HubEventProto hubEvent) {
+        HubEventAvro hubEventAvro = hubMapper.toHubEventAvroFromHubEventProto(hubEvent);
+        ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(topicHub, hubEventAvro);
+        log.debug("Отправка данных хаба: тип {} в топик {}", hubEvent.getPayloadCase(), topicHub);
         sendMessageTopic(record, "hubEvent");
     }
 
