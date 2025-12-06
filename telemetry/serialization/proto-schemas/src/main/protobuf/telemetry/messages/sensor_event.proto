@@ -8,15 +8,15 @@ option java_multiple_files = true;
 option java_package = "ru.yandex.practicum.grpc.telemetry.event";
 
 message SensorEventProto {
-  string id = 1; // идентификатор датчика
-  google.protobuf.Timestamp timestamp = 2; // таймстемп события
-  string hubId = 3; // идентификатор связанного хаба
-  oneof payload {// данные события от конкретного устройства
-    MotionSensorProto motion_sensor = 4;            // данные события датчика движения
-    TemperatureSensorProto temperature_sensor = 5;  // данные события температурного датчика
-    LightSensorProto light_sensor = 6;              // данные события датчика освещения
-    ClimateSensorProto climate_sensor = 7;          // данные события климатического датчика
-    SwitchSensorProto switch_sensor = 8;            // данные события датчика-переключателя
+  string id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string hubId = 3;
+  oneof payload {
+    MotionSensorProto motion_sensor = 4;
+    TemperatureSensorProto temperature_sensor = 5;
+    LightSensorProto light_sensor = 6;
+    ClimateSensorProto climate_sensor = 7;
+    SwitchSensorProto switch_sensor = 8;
   }
 }
 

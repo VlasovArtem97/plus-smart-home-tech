@@ -43,8 +43,9 @@ public class CollectorServiceImpl implements CollectorService {
     @Override
     public void addHubs(HubEventProto hubEvent) {
         HubEventAvro hubEventAvro = hubMapper.toHubEventAvroFromHubEventProto(hubEvent);
+        log.info("Объект {}", hubEventAvro);
         ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(topicHub, hubEventAvro);
-        log.debug("Отправка данных хаба: тип {} в топик {}", hubEvent.getPayloadCase(), topicHub);
+        log.info("Отправка данных хаба: тип {} в топик {}", hubEvent.getPayloadCase(), topicHub);
         sendMessageTopic(record, "hubEvent");
     }
 
