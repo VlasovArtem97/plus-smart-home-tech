@@ -1,56 +1,44 @@
 package ru.practicum.hub.mapper;
 
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import ru.practicum.hub.model.sensors.*;
+import org.mapstruct.MappingTarget;
+import ru.yandex.practicum.grpc.telemetry.event.*;
 import ru.yandex.practicum.kafka.telemetry.event.*;
+
+import java.time.Instant;
 
 @Mapper(componentModel = "spring")
 public interface SensorMapper {
 
-    @Named("climateSensorEventToAvro")
-    ClimateSensorAvro toClimateSensorAvro(ClimateSensorEvent event);
+    @Mapping(target = "payload", ignore = true)
+    @Mapping(target = "timestamp", ignore = true)
+    SensorEventAvro toSensorEventAvroFromSensorEventProto(SensorEventProto event);
 
-    @Named("lightSensorEventToAvro")
-    LightSensorAvro toLightSensorAvro(LightSensorEvent event);
+    @AfterMapping
+    default void getSensorEventAvro(@MappingTarget SensorEventAvro.Builder builder, SensorEventProto event) {
+        switch (event.getPayloadCase()) {
+            case SWITCH_SENSOR -> builder.setPayload(mapSwitchSensorProtoToAvro(event.getSwitchSensor()));
+            case CLIMATE_SENSOR -> builder.setPayload(mapClimateSensorProtoToAvro(event.getClimateSensor()));
+            case LIGHT_SENSOR -> builder.setPayload(mapLightSensorProtoToAvro(event.getLightSensor()));
+            case MOTION_SENSOR -> builder.setPayload(mapMotionSensorProtoToAvro(event.getMotionSensor()));
+            case TEMPERATURE_SENSOR ->
+                    builder.setPayload(mapTemperatureSensorProtoToAvro(event.getTemperatureSensor()));
+            default -> {
+                throw new IllegalStateException("Неизвестный тип: " + event.getPayloadCase());
+            }
+        }
+        builder.setTimestamp(Instant.ofEpochSecond(event.getTimestamp().getSeconds(), event.getTimestamp().getNanos()));
+    }
 
-    @Named("motionSensorEventToAvro")
-    MotionSensorAvro toMotionSensorAvro(MotionSensorEvent event);
+    MotionSensorAvro mapMotionSensorProtoToAvro(MotionSensorProto proto);
 
-    @Named("switchSensorEventToAvro")
-    SwitchSensorAvro toSwitchSensorAvro(SwitchSensorEvent event);
+    SwitchSensorAvro mapSwitchSensorProtoToAvro(SwitchSensorProto proto);
 
-    @Named("temperatureSensorEventToAvro")
-    TemperatureSensorAvro toTemperatureSensorAvro(TemperatureSensorEvent event);
+    ClimateSensorAvro mapClimateSensorProtoToAvro(ClimateSensorProto proto);
 
-    @Mapping(source = "event", target = "payload", qualifiedByName = "climateSensorEventToAvro")
-    @Mapping(source = "hubId", target = "hubId")
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "timestamp", target = "timestamp")
-    SensorEventAvro toSensorEventAvroFromClimateSensorEvent(ClimateSensorEvent event);
+    LightSensorAvro mapLightSensorProtoToAvro(LightSensorProto proto);
 
-    @Mapping(source = "event", target = "payload", qualifiedByName = "lightSensorEventToAvro")
-    @Mapping(source = "hubId", target = "hubId")
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "timestamp", target = "timestamp")
-    SensorEventAvro toSensorEventAvroFromLightSensorEvent(LightSensorEvent event);
-
-    @Mapping(source = "event", target = "payload", qualifiedByName = "motionSensorEventToAvro")
-    @Mapping(source = "hubId", target = "hubId")
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "timestamp", target = "timestamp")
-    SensorEventAvro toSensorEventAvroFromMotionSensorEvent(MotionSensorEvent event);
-
-    @Mapping(source = "event", target = "payload", qualifiedByName = "switchSensorEventToAvro")
-    @Mapping(source = "hubId", target = "hubId")
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "timestamp", target = "timestamp")
-    SensorEventAvro toSensorEventAvroFromSwitchSensorEvent(SwitchSensorEvent event);
-
-    @Mapping(source = "event", target = "payload", qualifiedByName = "temperatureSensorEventToAvro")
-    @Mapping(source = "hubId", target = "hubId")
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "timestamp", target = "timestamp")
-    SensorEventAvro toSensorEventAvroFromTemperatureSensorEvent(TemperatureSensorEvent event);
+    TemperatureSensorAvro mapTemperatureSensorProtoToAvro(TemperatureSensorProto proto);
 }
