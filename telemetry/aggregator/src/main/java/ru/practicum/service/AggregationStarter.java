@@ -41,14 +41,14 @@ public class AggregationStarter {
             Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
             consumer.subscribe(List.of(topicSensor));
             while (true) {
-                ConsumerRecords<String, SpecificRecordBase> record = consumer.poll(Duration.ofSeconds(5));
+                ConsumerRecords<String, SpecificRecordBase> record = consumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord<String, SpecificRecordBase> rec : record) {
                     log.debug("Получены данные: {} из топика: {} kafka", rec.value(), topicSensor);
                     Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationJob
                             .updateState((SensorEventAvro) rec.value());
                     if (sensorsSnapshotAvro.isPresent()) {
                         SensorsSnapshotAvro snapshotAvro = sensorsSnapshotAvro.get();
-                        log.debug("Данные SensorsSnapshotAvro обновлены: {}", sensorsSnapshotAvro);
+                        log.debug("Данные SensorsSnapshotAvro обновлены: {}", snapshotAvro);
                         sendMessageTopic(new ProducerRecord<>(topicSnapShot, snapshotAvro), "SnapshotEvent");
                     } else {
                         log.debug("Данные не были обновлены");

@@ -50,7 +50,7 @@ public class AggregationJob {
                     event.getTimestamp());
             return Optional.empty();
         } else {
-            if (oldSensorState.getData().equals(event)) {
+            if (oldSensorState.getData().equals(event.getPayload())) {
                 log.debug("Переданный объект {}, равен ранее сохраненному: {}. Обновление не требуется",
                         oldSensorState.getData(), event);
             } else {
