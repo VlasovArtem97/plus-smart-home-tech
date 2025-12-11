@@ -18,16 +18,22 @@ public class AggregationJob {
     private final SensorSnapshotMapper mapper;
 
     Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
-        return Optional.ofNullable(snapshotAvroMap.get(event.getHubId()))
-                .filter(oldSensorStateAvro -> oldSensorStateAvro.getTimestamp()
-                        .isBefore(event.getTimestamp()))
-                .filter(oldSensorStateAvro -> !oldSensorStateAvro.getSensorsState()
-                        .equals(event.getPayload()))
-                .map(oldSensorStateAvro -> {
-                    SensorsSnapshotAvro sensorsSnapshotAvro = mapper.toSensorSnapshotAvro(event);
-                    snapshotAvroMap.put(event.getHubId(), sensorsSnapshotAvro);
-                    return snapshotAvroMap.get(event.getHubId());
-                });
+        String hubId = event.getHubId();
+        SensorsSnapshotAvro existingSnapshot = snapshotAvroMap.get(hubId);
+        if (existingSnapshot == null) {
+            SensorsSnapshotAvro newSnapshot = mapper.toSensorSnapshotAvro(event);
+            snapshotAvroMap.put(hubId, newSnapshot);
+            return Optional.of(newSnapshot);
+        } else {
+            if (existingSnapshot.getTimestamp().isBefore(event.getTimestamp()) &&
+                    !existingSnapshot.getSensorsState().equals(event.getPayload())) {
+                SensorsSnapshotAvro newSnapshot = mapper.toSensorSnapshotAvro(event);
+                snapshotAvroMap.put(hubId, newSnapshot);
+                return Optional.of(newSnapshot);
+            } else {
+                return Optional.empty();
+            }
+        }
     }
 
 }

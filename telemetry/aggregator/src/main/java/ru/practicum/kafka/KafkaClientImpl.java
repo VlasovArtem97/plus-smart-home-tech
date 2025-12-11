@@ -12,6 +12,7 @@ import org.apache.kafka.common.serialization.VoidSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.practicum.avrodeserializer.BaseAvroDeserializer;
+import ru.practicum.avrodeserializer.SensorEventAvroDeserializer;
 import ru.practicum.avroserialization.AvroSerialization;
 
 import java.time.Duration;
@@ -27,7 +28,7 @@ public class KafkaClientImpl implements KafkaClient, AutoCloseable {
     @Value("${kafka.consumerClientIdForAggregator}")
     private String clientIdConfig;
 
-    @Value("${kafka.consumerClientIdForAggregator}")
+    @Value("${kafka.consumerGroupIdForAggregator}")
     private String groupId;
 
     private Producer<String, SpecificRecordBase> producer;
@@ -64,7 +65,7 @@ public class KafkaClientImpl implements KafkaClient, AutoCloseable {
         config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaPort);
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, VoidDeserializer.class.getName());
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, BaseAvroDeserializer.class.getName());
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SensorEventAvroDeserializer.class.getName());
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         consumer = new KafkaConsumer<>(config);
     }
