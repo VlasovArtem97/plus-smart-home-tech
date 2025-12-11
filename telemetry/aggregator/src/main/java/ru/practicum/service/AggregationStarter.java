@@ -36,17 +36,21 @@ public class AggregationStarter {
 
     public void start() {
         try {
+            log.info("Начинается работа по получению данных из топика: {} kafka", topicSensor);
             Consumer<String, SpecificRecordBase> consumer = kafkaClient.getConsumer();
             Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
             consumer.subscribe(List.of(topicSensor));
             while (true) {
                 ConsumerRecords<String, SpecificRecordBase> record = consumer.poll(Duration.ofSeconds(5));
                 for (ConsumerRecord<String, SpecificRecordBase> rec : record) {
+                    log.debug("Получены данные: {} из топика: {} kafka", rec, topicSensor);
                     Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationJob
                             .updateState((SensorEventAvro) rec.value());
                     sensorsSnapshotAvro.ifPresent(snapshotAvro -> {
+                        log.debug("Данные SensorsSnapshotAvro обновлены: {}", sensorsSnapshotAvro);
                         sendMessageTopic(new ProducerRecord<>(topicSnapShot, snapshotAvro), "SnapshotEvent");
                     });
+                    log.debug("Данные не были обновлены");
                 }
                 consumer.commitSync();
             }
@@ -56,6 +60,7 @@ public class AggregationStarter {
         } catch (Exception e) {
             log.error("Ошибка во время обработки событий от датчиков", e);
         } finally {
+            log.info("Начинается закрытие producer и consumer");
             kafkaClient.close();
         }
     }
@@ -67,7 +72,7 @@ public class AggregationStarter {
                 if (exception != null) {
                     log.error("Не удалось отправить {}: {}", typeEvent, exception.getMessage());
                 } else {
-                    log.info("{} успешно отправлены в партицию {} с смещением {}", typeEvent, metadata.partition(), metadata.offset());
+                    log.debug("{} успешно отправлены в партицию {} с смещением {}", typeEvent, metadata.partition(), metadata.offset());
                 }
             });
         } catch (Exception e) {
