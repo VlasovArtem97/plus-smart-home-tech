@@ -43,14 +43,16 @@ public class AggregationStarter {
             while (true) {
                 ConsumerRecords<String, SpecificRecordBase> record = consumer.poll(Duration.ofSeconds(5));
                 for (ConsumerRecord<String, SpecificRecordBase> rec : record) {
-                    log.debug("Получены данные: {} из топика: {} kafka", rec, topicSensor);
+                    log.debug("Получены данные: {} из топика: {} kafka", rec.value(), topicSensor);
                     Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationJob
                             .updateState((SensorEventAvro) rec.value());
-                    sensorsSnapshotAvro.ifPresent(snapshotAvro -> {
+                    if (sensorsSnapshotAvro.isPresent()) {
+                        SensorsSnapshotAvro snapshotAvro = sensorsSnapshotAvro.get();
                         log.debug("Данные SensorsSnapshotAvro обновлены: {}", sensorsSnapshotAvro);
                         sendMessageTopic(new ProducerRecord<>(topicSnapShot, snapshotAvro), "SnapshotEvent");
-                    });
-                    log.debug("Данные не были обновлены");
+                    } else {
+                        log.debug("Данные не были обновлены");
+                    }
                 }
                 consumer.commitSync();
             }
@@ -60,7 +62,7 @@ public class AggregationStarter {
         } catch (Exception e) {
             log.error("Ошибка во время обработки событий от датчиков", e);
         } finally {
-            log.info("Начинается закрытие producer и consumer");
+            log.debug("Начинается закрытие producer и consumer");
             kafkaClient.close();
         }
     }

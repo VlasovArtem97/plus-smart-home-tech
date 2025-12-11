@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.mapper.SensorSnapshotMapper;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 import java.util.HashMap;
@@ -21,28 +22,45 @@ public class AggregationJob {
 
     Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
         log.info("Начинается процесс обновления данных по полученному объекту: {}", event);
+
         String hubId = event.getHubId();
-        SensorsSnapshotAvro existingSnapshot = snapshotAvroMap.get(hubId);
-        if (existingSnapshot == null) {
-            log.debug("Данных SensorsSnapshotAvro по hubId: {}, не обнаружено", event.getHubId());
+        String sensorId = event.getId();
+
+        SensorsSnapshotAvro oldSnapshot = snapshotAvroMap.get(hubId);
+        if (oldSnapshot == null) {
+            log.debug("Данных в SensorsSnapshotAvro по hubId: {}, не обнаружено", event.getHubId());
             SensorsSnapshotAvro newSnapshot = mapper.toSensorSnapshotAvro(event);
             snapshotAvroMap.put(hubId, newSnapshot);
             return Optional.of(newSnapshot);
+        }
+
+        SensorStateAvro oldSensorState = oldSnapshot.getSensorsState().get(sensorId);
+        if(oldSensorState == null) {
+            log.debug("Данных в SensorStateAvro по sensorId: {} из SensorsSnapshotAvro c hubId: {}, не обнаружено",
+                    sensorId, hubId);
+            SensorStateAvro newSensorState = mapper.toSensorStateAvro(event);
+            oldSnapshot.getSensorsState().put(sensorId, newSensorState);
+            snapshotAvroMap.put(hubId, oldSnapshot);
+            return Optional.of(snapshotAvroMap.get(hubId));
+        }
+
+        if(oldSensorState.getTimestamp().isAfter(event.getTimestamp())) {
+            log.debug("Timestamp у переданного датчика стоит раньше, чем у сохраненного датчика. Время переданного " +
+                    "датчика: {}, Время сохранного датчика: {}. Обновление не требуется", oldSnapshot.getTimestamp(),
+                    event.getTimestamp());
+            return Optional.empty();
         } else {
-            log.debug("Найдены старые данные SensorsSnapshotAvro по hubId: {}, {}", event.getHubId(), existingSnapshot);
-            if (existingSnapshot.getTimestamp().isBefore(event.getTimestamp()) &&
-                    !existingSnapshot.getSensorsState().equals(event.getPayload())) {
-                SensorsSnapshotAvro newSnapshot = mapper.toSensorSnapshotAvro(event);
-                snapshotAvroMap.put(hubId, newSnapshot);
-                log.debug("Обновленный объект: {}", newSnapshot);
-                return Optional.of(newSnapshot);
+            if (oldSensorState.getData().equals(event)) {
+                log.debug("Переданный объект {}, равен ранее сохраненному: {}. Обновление не требуется",
+                        oldSensorState.getData(), event);
             } else {
-                log.debug("Указанные данные в полученном объекте не соответствуют обновленным " +
-                        "данным (время старое, либо тот-же объект передан). Переданный объект: {}. Сохраненный объект: " +
-                        "{}", event, existingSnapshot);
-                return Optional.empty();
+                SensorStateAvro updateSensorStateAvro = mapper.toSensorStateAvro(event);
+                oldSnapshot.getSensorsState().put(sensorId, updateSensorStateAvro);
+                snapshotAvroMap.put(hubId, oldSnapshot);
+                return Optional.of(snapshotAvroMap.get(hubId));
             }
         }
+        return Optional.empty();
     }
 
 }

@@ -20,7 +20,7 @@ public interface SensorSnapshotMapper {
     @AfterMapping
     default void toSensorsState(@MappingTarget SensorsSnapshotAvro.Builder snapshot, SensorEventAvro sensorEventAvro) {
         Map<String, SensorStateAvro> map = new HashMap<>();
-        map.put(sensorEventAvro.getHubId(), toSensorStateAvro(sensorEventAvro));
+        map.put(sensorEventAvro.getId(), toSensorStateAvro(sensorEventAvro));
         snapshot.setSensorsState(map);
     }
 
