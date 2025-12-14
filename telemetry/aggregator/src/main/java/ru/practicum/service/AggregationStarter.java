@@ -28,6 +28,10 @@ public class AggregationStarter {
 
     private final AggregationJob aggregationJob;
 
+    private Consumer<String, SpecificRecordBase> consumer;
+
+    private Producer<String, SpecificRecordBase> producer;
+
     @Value("${kafka.topicSensor}")
     private String topicSensor;
 
@@ -35,28 +39,24 @@ public class AggregationStarter {
     private String topicSnapShot;
 
     public void start() {
+
+        log.info("Начинается работа по получению данных из топика: {} kafka", topicSensor);
+
         try {
-            log.info("Начинается работа по получению данных из топика: {} kafka", topicSensor);
-            Consumer<String, SpecificRecordBase> consumer = kafkaClient.getConsumer();
+            consumer = kafkaClient.getConsumer();
+            producer = kafkaClient.getProducer();
+
             Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
+
             consumer.subscribe(List.of(topicSensor));
+
             while (true) {
                 ConsumerRecords<String, SpecificRecordBase> record = consumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord<String, SpecificRecordBase> rec : record) {
-                    log.debug("Получены данные: {} из топика: {} kafka", rec.value(), topicSensor);
-                    Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationJob
-                            .updateState((SensorEventAvro) rec.value());
-                    if (sensorsSnapshotAvro.isPresent()) {
-                        SensorsSnapshotAvro snapshotAvro = sensorsSnapshotAvro.get();
-                        log.debug("Данные SensorsSnapshotAvro обновлены: {}", snapshotAvro);
-                        sendMessageTopic(new ProducerRecord<>(topicSnapShot, snapshotAvro), "SnapshotEvent");
-                    } else {
-                        log.debug("Данные не были обновлены");
-                    }
+                    record(rec);
                 }
                 consumer.commitSync();
             }
-
         } catch (WakeupException ignored) {
 
         } catch (Exception e) {
@@ -67,9 +67,21 @@ public class AggregationStarter {
         }
     }
 
+    private void record(ConsumerRecord<String, SpecificRecordBase> rec) {
+        log.debug("Получены данные: {} из топика: {} kafka", rec.value(), topicSensor);
+        Optional<SensorsSnapshotAvro> sensorsSnapshotAvro = aggregationJob
+                .updateState((SensorEventAvro) rec.value());
+        if (sensorsSnapshotAvro.isPresent()) {
+            SensorsSnapshotAvro snapshotAvro = sensorsSnapshotAvro.get();
+            log.debug("Данные SensorsSnapshotAvro обновлены: {}", snapshotAvro);
+            sendMessageTopic(new ProducerRecord<>(topicSnapShot, snapshotAvro), "SnapshotEvent");
+        } else {
+            log.debug("Данные не были обновлены");
+        }
+    }
+
     private void sendMessageTopic(ProducerRecord<String, SpecificRecordBase> record, String typeEvent) {
         try {
-            Producer<String, SpecificRecordBase> producer = kafkaClient.getProducer();
             producer.send(record, (metadata, exception) -> {
                 if (exception != null) {
                     log.error("Не удалось отправить {}: {}", typeEvent, exception.getMessage());

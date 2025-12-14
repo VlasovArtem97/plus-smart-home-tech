@@ -11,7 +11,6 @@ import org.apache.kafka.common.serialization.VoidDeserializer;
 import org.apache.kafka.common.serialization.VoidSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.practicum.avrodeserializer.BaseAvroDeserializer;
 import ru.practicum.avrodeserializer.SensorEventAvroDeserializer;
 import ru.practicum.avroserialization.AvroSerialization;
 
@@ -71,25 +70,37 @@ public class KafkaClientImpl implements KafkaClient, AutoCloseable {
     }
 
     @Override
-    public void close() {
+    public void closeConsumer() {
         try {
-            producer.flush();
             if (consumer != null) {
-                consumer.commitSync();
+                consumer.close(Duration.ofSeconds(10));
+                log.info("Консьюмер закрыт");
             }
         } catch (Exception e) {
-            log.error("Ошибка при завершении работы: ", e);
+            log.error("Ошибка при закрытии консьюмера", e);
         } finally {
-            if (consumer != null) {
-                log.info("Закрываем консьюмер");
-                consumer.close(Duration.ofSeconds(10));
-                consumer = null;
-            }
-            if (producer != null) {
-                log.info("Закрываем продюсер");
-                producer.close();
-                producer = null;
-            }
+            consumer = null;
         }
+    }
+
+    @Override
+    public void closeProducer() {
+        try {
+            if (producer != null) {
+                producer.flush();
+                producer.close();
+                log.info("Producer закрыт");
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при закрытии producer", e);
+        } finally {
+            producer = null;
+        }
+    }
+
+    @Override
+    public void close() {
+        closeConsumer();
+        closeProducer();
     }
 }
