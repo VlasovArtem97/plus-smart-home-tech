@@ -35,7 +35,7 @@ public class AggregationJob {
         }
 
         SensorStateAvro oldSensorState = oldSnapshot.getSensorsState().get(sensorId);
-        if(oldSensorState == null) {
+        if (oldSensorState == null) {
             log.debug("Данных в SensorStateAvro по sensorId: {} из SensorsSnapshotAvro c hubId: {}, не обнаружено",
                     sensorId, hubId);
             SensorStateAvro newSensorState = mapper.toSensorStateAvro(event);
@@ -44,9 +44,9 @@ public class AggregationJob {
             return Optional.of(snapshotAvroMap.get(hubId));
         }
 
-        if(oldSensorState.getTimestamp().isAfter(event.getTimestamp())) {
+        if (oldSensorState.getTimestamp().isAfter(event.getTimestamp())) {
             log.debug("Timestamp у переданного датчика стоит раньше, чем у сохраненного датчика. Время переданного " +
-                    "датчика: {}, Время сохранного датчика: {}. Обновление не требуется", oldSnapshot.getTimestamp(),
+                            "датчика: {}, Время сохранного датчика: {}. Обновление не требуется", oldSnapshot.getTimestamp(),
                     event.getTimestamp());
             return Optional.empty();
         } else {

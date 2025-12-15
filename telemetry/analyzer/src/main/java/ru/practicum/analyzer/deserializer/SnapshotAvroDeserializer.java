@@ -4,7 +4,7 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 public class SnapshotAvroDeserializer extends BaseAvroDeserializer<SensorsSnapshotAvro> {
 
-    private SnapshotAvroDeserializer() {
+    public SnapshotAvroDeserializer() {
         super(SensorsSnapshotAvro.getClassSchema());
     }
 }

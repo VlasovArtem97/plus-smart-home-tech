@@ -14,6 +14,7 @@ import java.util.Map;
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 @Table(name = "scenarios")
+@ToString
 public class Scenario {
 
     @Id
@@ -24,6 +25,7 @@ public class Scenario {
 
     private String name;
 
+    @ToString.Exclude
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapKeyColumn(
             table = "scenario_conditions",
@@ -34,6 +36,7 @@ public class Scenario {
             inverseJoinColumns = @JoinColumn(name = "condition_id"))
     private Map<String, Condition> conditions = new HashMap<>();
 
+    @ToString.Exclude
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapKeyColumn(
             table = "scenario_actions",

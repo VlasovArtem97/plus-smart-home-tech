@@ -3,6 +3,7 @@ package ru.practicum.analyzer.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.analyzer.mapper.ScenarioMapper;
 import ru.practicum.analyzer.mapper.SensorMapper;
 import ru.practicum.analyzer.model.Scenario;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class HubEventProcessorJob {
 
     private final SensorRepository sensorRepository;
@@ -46,7 +48,7 @@ public class HubEventProcessorJob {
         String sensorId = eventAvro.getId();
 
         Optional<Sensor> sensor = sensorRepository.findByIdAndHubId(sensorId, hubId);
-        if (sensor.isEmpty()) {
+        if (sensor.isPresent()) {
             log.info("Датчик с id: {}, из hubId: {} уже добавлен", sensorId, hubId);
             return;
         }
@@ -84,7 +86,6 @@ public class HubEventProcessorJob {
         if (!sensors) {
             log.error("В hub c id {}, отсутствую сенсоры с Ids: {}", hubId, sensorIds);
             return;
-//            throw new IllegalArgumentException("В hub c Id " + hubId + " отсутствуют датчики с Ids: " + sensorIds);
         }
 
         Optional<Scenario> scenario = scenarioRepository.findByHubIdAndName(hubId, avro.getName());

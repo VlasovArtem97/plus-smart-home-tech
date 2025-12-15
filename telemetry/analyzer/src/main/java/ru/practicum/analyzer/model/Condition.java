@@ -14,6 +14,7 @@ import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 @Table(name = "conditions")
+@ToString
 public class Condition {
 
     @Id

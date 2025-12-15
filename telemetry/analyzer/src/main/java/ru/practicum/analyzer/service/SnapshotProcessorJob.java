@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.analyzer.mapper.ActionMapper;
 import ru.practicum.analyzer.model.Action;
 import ru.practicum.analyzer.model.Condition;
@@ -19,6 +20,7 @@ import java.util.Map;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SnapshotProcessorJob {
 
     @GrpcClient("hub-router")
@@ -47,7 +49,8 @@ public class SnapshotProcessorJob {
     private boolean isConditionEqualSnapshot(Map<String, Condition> conditionMap, SensorsSnapshotAvro avro) {
         return conditionMap.entrySet()
                 .stream()
-                .allMatch(condition -> isConditionValue(condition.getKey(), condition.getValue(), avro));
+                .allMatch(condition -> isConditionValue(condition.getKey(),
+                        condition.getValue(), avro));
     }
 
     private boolean isConditionValue(String sensorId, Condition condition, SensorsSnapshotAvro snapshot) {
@@ -119,7 +122,7 @@ public class SnapshotProcessorJob {
             log.info("Начинаю отправку в hub_router - DeviceActionRequest {}", deviceActionRequest);
             try {
                 hubRouterClient.handleDeviceAction(deviceActionRequest);
-                log.debug("");
+                log.debug("Активация успешно отправлена");
             } catch (Exception e) {
                 log.error("Ошибка при отправке действия в hub_router DeviceActionRequest {}",
                         deviceActionRequest, e);

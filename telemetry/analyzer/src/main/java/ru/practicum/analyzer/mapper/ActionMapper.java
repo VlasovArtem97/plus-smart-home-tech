@@ -1,12 +1,10 @@
 package ru.practicum.analyzer.mapper;
 
 import com.google.protobuf.Timestamp;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import ru.practicum.analyzer.model.Action;
 import ru.practicum.analyzer.model.Scenario;
+import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
 
 import java.time.Instant;
@@ -16,6 +14,7 @@ public interface ActionMapper {
 
     @Mapping(source = "scenario.name", target = "scenarioName")
     @Mapping(target = "timestamp", ignore = true)
+    @Mapping(target = "action", expression = "java(toDeviceActionProto(action, sensorId))")
     DeviceActionRequest toDeviceActionRequest(Scenario scenario, Action action, String sensorId);
 
     @AfterMapping
@@ -26,4 +25,7 @@ public interface ActionMapper {
                 .setNanos(instant.getNano())
                 .build());
     }
+
+    @Named("toDeviceActionProto")
+    DeviceActionProto toDeviceActionProto(Action avro, String sensorId);
 }

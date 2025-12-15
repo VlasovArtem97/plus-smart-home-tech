@@ -14,6 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 @Table(name = "sensors")
+@ToString
 public class Sensor {
 
     @Id

@@ -12,6 +12,7 @@ import ru.yandex.practicum.kafka.telemetry.event.ActionTypeAvro;
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 @Table(name = "actions")
+@ToString
 public class Action {
 
     @Id
