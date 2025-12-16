@@ -56,6 +56,7 @@ public class AggregationStarter {
                     record(rec);
                 }
                 consumer.commitSync();
+                producer.flush();
             }
         } catch (WakeupException ignored) {
 

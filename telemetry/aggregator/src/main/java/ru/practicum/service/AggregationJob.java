@@ -20,7 +20,7 @@ public class AggregationJob {
     private final Map<String, SensorsSnapshotAvro> snapshotAvroMap = new HashMap<>();
     private final SensorSnapshotMapper mapper;
 
-    Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
+    public Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
         log.info("Начинается процесс обновления данных по полученному объекту: {}", event);
 
         String hubId = event.getHubId();
