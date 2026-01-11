@@ -12,7 +12,7 @@ public class ErrorHandler extends GlobalErrorHandler {
 
     @ExceptionHandler(SpecifiedProductAlreadyInWarehouseException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleProductAlreadyInWarehouse(SpecifiedProductAlreadyInWarehouseException e) {
+    public ApiError handleSpecifiedProductAlreadyInWarehouseException(SpecifiedProductAlreadyInWarehouseException e) {
         log.error("Ошибка: товар с таким описанием уже зарегистрирован на складе " +
                 "(SpecifiedProductAlreadyInWarehouseException): {}", e.getMessage());
         return build(HttpStatus.BAD_REQUEST, "Ошибка, товар с таким описанием уже зарегистрирован на складе.",
@@ -21,7 +21,7 @@ public class ErrorHandler extends GlobalErrorHandler {
 
     @ExceptionHandler(ProductInShoppingCartLowQuantityInWarehouse.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleProductAlreadyInWarehouse(ProductInShoppingCartLowQuantityInWarehouse e) {
+    public ApiError handleProductInShoppingCartLowQuantityInWarehouse(ProductInShoppingCartLowQuantityInWarehouse e) {
         log.error("Ошибка: товар из корзины не находится в требуемом количестве на складе " +
                 "(ProductInShoppingCartLowQuantityInWarehouse): {}", e.getMessage());
         return build(HttpStatus.BAD_REQUEST, "Ошибка, товар из корзины не находится в требуемом количестве " +
@@ -30,7 +30,7 @@ public class ErrorHandler extends GlobalErrorHandler {
 
     @ExceptionHandler(NoSpecifiedProductInWarehouseException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleProductAlreadyInWarehouse(NoSpecifiedProductInWarehouseException e) {
+    public ApiError handleNoSpecifiedProductInWarehouseException(NoSpecifiedProductInWarehouseException e) {
         log.error("Ошибка: нет информации о товаре на складе (NoSpecifiedProductInWarehouseException): {}",
                 e.getMessage());
         return build(HttpStatus.BAD_REQUEST, "Нет информации о товаре на складе.", e.getMessage(),

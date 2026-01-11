@@ -9,6 +9,10 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.contract.interactionapi.exception.fiegnclient.BadRequestException;
+import ru.practicum.contract.interactionapi.exception.fiegnclient.InternalServerErrorException;
+import ru.practicum.contract.interactionapi.exception.fiegnclient.NotAuthorizedException;
+import ru.practicum.contract.interactionapi.exception.fiegnclient.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -78,10 +82,44 @@ public class GlobalErrorHandler {
                 DataIntegrityViolationException.class.getSimpleName());
     }
 
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleException(final Exception e) {
         log.error("Internal server error - {}", e.getMessage());
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error.", e.getMessage(),
                 Exception.class.getSimpleName());
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleFeignClientBadRequestException(final BadRequestException e) {
+        log.error("Ошибка в обращении через feignClient (BadRequestException): {}", e.getMessage());
+        return build(e.getHttpStatus(), "Ошибка в обращении через feignClient", e.getMessage(),
+                BadRequestException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleFeignClientNotFoundException(final NotFoundException e) {
+        log.error("Ошибка в обращении через feignClient (NotFoundException): {}", e.getMessage());
+        return build(e.getHttpStatus(), "Ошибка в обращении через feignClient", e.getMessage(),
+                NotFoundException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(InternalServerErrorException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleFeignClientInternalServerErrorException(final InternalServerErrorException e) {
+        log.error("Ошибка в обращении через feignClient (InternalServerErrorException): {}", e.getMessage());
+        return build(e.getHttpStatus(), "Ошибка в обращении через feignClient", e.getMessage(),
+                InternalServerErrorException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(NotAuthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleFeignClientNotFoundException(final NotAuthorizedException e) {
+        log.error("Ошибка в обращении через feignClient (NotAuthorizedException): {}", e.getMessage());
+        return build(e.getHttpStatus(), "Ошибка в обращении через feignClient", e.getMessage(),
+                NotAuthorizedException.class.getSimpleName());
+    }
+
 }

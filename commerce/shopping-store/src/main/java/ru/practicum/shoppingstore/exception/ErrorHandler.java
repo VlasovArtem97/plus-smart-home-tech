@@ -12,7 +12,7 @@ public class ErrorHandler extends GlobalErrorHandler {
 
     @ExceptionHandler(ProductNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handle404(ProductNotFoundException e) {
+    public ApiError handleProductNotFoundException(ProductNotFoundException e) {
         log.error("The required object was not found (ProductNotFoundException error): {}", e.getMessage());
         return build(HttpStatus.NOT_FOUND, "The required object was not found.", e.getMessage(),
                 ProductNotFoundException.class.getSimpleName());

@@ -12,8 +12,6 @@ public interface ShoppingCartMapper {
 
     ShoppingCartDto toShoppingCartDtoFromShoppingCart(ShoppingCart shoppingCart);
 
-    //    ShoppingCart toShoppingCartFromShoppingCartDto(ShoppingCartDto shoppingCartDto);
-//
     default ShoppingCartDto toUpdateQuantity(ShoppingCartDto shoppingCartDto, Map<UUID, Long> products) {
         for (Map.Entry<UUID, Long> sc : shoppingCartDto.getProducts().entrySet()) {
             UUID id = sc.getKey();

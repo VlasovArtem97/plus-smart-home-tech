@@ -1,22 +1,6 @@
-server:
-  port: 0
-
-spring:
-  datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/commerce_warehouse
-    username: analyzer
-    password: analyzer
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        format_sql: true
-    show_sql: true
-  sql:
-    init:
-      mode: always
+feign:
+  circuitbreaker:
+    enabled: true
 
 resilience4j.circuitbreaker:
   configs:
@@ -24,7 +8,7 @@ resilience4j.circuitbreaker:
       slidingWindowSize: 50
       failureRateThreshold: 50
   instances:
-    warehouse:
+    myFeignClient:
       slidingWindowSize: 10
       waitDurationInOpenState: 10000
       permittedNumberOfCallsInHalfOpenState: 3
@@ -34,6 +18,4 @@ resilience4j.circuitbreaker:
 
 logging:
   level:
-    ru:
-      practicum: DEBUG
     io.github.resilience4j: DEBUG

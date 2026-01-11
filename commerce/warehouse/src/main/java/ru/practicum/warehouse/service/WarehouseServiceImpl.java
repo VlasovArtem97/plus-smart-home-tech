@@ -164,18 +164,4 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .fragile(fragile)
                 .build();
     }
-
-
-//    @Transactional(readOnly = true)
-//    private void findWarehouseProductById(UUID productId) {
-//        log.info("Осуществляется поиск товара на складе c id {}", productId);
-//        WarehouseProduct warehouseProduct = warehouseRepository.findByProductId(productId)
-//                .orElseThrow(() -> {
-//                    log.error("Ошибка, товар с id: [ {} ] уже зарегистрирован на складе", productId);
-//                    return new SpecifiedProductAlreadyInWarehouseException("Ошибка, товар с id: [ " + productId + " ] " +
-//                            "уже зарегистрирован на складе");
-//                });
-//        log.debug("Найденный продукт на складе: {}", warehouseProduct);
-//        return warehouseProduct;
-//    }
 }

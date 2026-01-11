@@ -2,11 +2,17 @@ package ru.practicum.shoppingcart.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.contract.interactionapi.dto.shoppingcart.ChangeProductQuantityRequest;
 import ru.practicum.contract.interactionapi.dto.shoppingcart.ShoppingCartDto;
+import ru.practicum.contract.interactionapi.exception.fiegnclient.BadRequestException;
+import ru.practicum.contract.interactionapi.exception.fiegnclient.InternalServerErrorException;
+import ru.practicum.contract.interactionapi.exception.fiegnclient.NotAuthorizedException;
+import ru.practicum.contract.interactionapi.exception.fiegnclient.NotFoundException;
 import ru.practicum.contract.interactionapi.feignclient.WarehouseClient;
+import ru.practicum.shoppingcart.exception.CartStateDeactivateException;
 import ru.practicum.shoppingcart.exception.NoProductsInShoppingCartException;
 import ru.practicum.shoppingcart.exception.NotAuthorizedUserException;
 import ru.practicum.shoppingcart.exception.NotFoundUserException;
@@ -64,6 +70,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 userName, productId);
         checkUserName(userName);
         ShoppingCart shoppingCart = findShoppingCartByUserName(userName);
+        checkCartState(shoppingCart);
         ShoppingCart updateShoppingCart = removeProductFromShoppingCart(shoppingCart, productId);
         ShoppingCartDto shoppingCartDto = shoppingCartMapper.toShoppingCartDtoFromShoppingCart(
                 shoppingCartRepository.save(updateShoppingCart));
@@ -75,14 +82,19 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto changeProductQuantity(String userName, ChangeProductQuantityRequest quantityRequest) {
         log.info("Получен запрос на изменение количество товаров в корзине от пользователя : [ {} ]. " +
                 "Измененное количество: {}", userName, quantityRequest);
+
         checkUserName(userName);
         ShoppingCart shoppingCart = findShoppingCartByUserName(userName);
+        checkCartState(shoppingCart);
         checkProductIdFromShoppingCart(shoppingCart.getProducts(), List.of(quantityRequest.getProductId()));
 
-        shoppingCart.getProducts().put(quantityRequest.getProductId(), quantityRequest.getNewQuantity());
-
-        shoppingCartRepository.save(shoppingCart);
         ShoppingCartDto shoppingCartDto = shoppingCartMapper.toShoppingCartDtoFromShoppingCart(shoppingCart);
+        shoppingCartDto.getProducts().put(quantityRequest.getProductId(), quantityRequest.getNewQuantity());
+        increaseQuantity(shoppingCartDto);
+
+        shoppingCart.getProducts().put(quantityRequest.getProductId(), quantityRequest.getNewQuantity());
+        shoppingCartRepository.save(shoppingCart);
+        ShoppingCartDto shoppingCartDtoUpdate = shoppingCartMapper.toShoppingCartDtoFromShoppingCart(shoppingCart);
         log.debug("Количество продуктов обновлено. {}", shoppingCartDto);
         return shoppingCartDto;
     }
@@ -93,6 +105,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         if (shoppingCartOptional.isPresent()) {
             log.debug("Найдена корзина покупателя: {}", shoppingCartOptional);
             shoppingCart = shoppingCartOptional.get();
+            checkCartState(shoppingCart);
             ShoppingCartDto shoppingCartDto = shoppingCartMapper.toShoppingCartDtoFromShoppingCart(shoppingCart);
             ShoppingCartDto updateQuantity = shoppingCartMapper.toUpdateQuantity(shoppingCartDto, products);
             increaseQuantity(updateQuantity);
@@ -135,9 +148,21 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     private ShoppingCartDto increaseQuantity(ShoppingCartDto shoppingCartDto) {
         log.info("Начинается проверка количества продуктов в корзине покупателя и на складе");
-        warehouseClient.checkProductQuantityEnoughForShoppingCart(shoppingCartDto);
-        log.debug("Добавленная корзина: {}", shoppingCartDto);
-        return shoppingCartDto;
+        try {
+            warehouseClient.checkProductQuantityEnoughForShoppingCart(shoppingCartDto);
+            log.debug("Добавленная корзина: {}", shoppingCartDto);
+            return shoppingCartDto;
+        } catch (NotFoundUserException e) {
+            throw new NotFoundException(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (InternalServerErrorException e) {
+            throw new InternalServerErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotAuthorizedException e) {
+            throw new NotAuthorizedException(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch (BadRequestException e) {
+            throw new BadRequestException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -164,5 +189,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             throw new NoProductsInShoppingCartException(String.join("\n", message));
         }
         log.debug("Все продукты найдены в корзине покупателя");
+    }
+
+    @Transactional(readOnly = true)
+    private void checkCartState(ShoppingCart shoppingCart) {
+        if (shoppingCart.getCartState().equals(CartState.DEACTIVATE)) {
+            log.error("Корзина недоступна для изменений: {}", shoppingCart.getCartState());
+            throw new CartStateDeactivateException("Корзина недоступна для изменений: " + shoppingCart.getCartState());
+        }
     }
 }

@@ -2,11 +2,11 @@ package ru.practicum.contract.interactionapi.exception.fiegnclient;
 
 import org.springframework.http.HttpStatus;
 
-public class InternalServerErrorException extends RuntimeException {
+public class BadRequestException extends RuntimeException {
 
     private final HttpStatus httpStatus;
 
-    public InternalServerErrorException(String message, HttpStatus httpStatus) {
+    public BadRequestException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
     }

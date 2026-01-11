@@ -31,7 +31,7 @@ public class ShoppingCart {
     @Column(name = "quantity")
     private Map<UUID, Long> products;
 
-    @Column(name = "user_name", nullable = false, unique = true)
+    @Column(name = "user_name", nullable = false, unique = true, length = 255)
     private String userName;
 
     @Enumerated(EnumType.STRING)

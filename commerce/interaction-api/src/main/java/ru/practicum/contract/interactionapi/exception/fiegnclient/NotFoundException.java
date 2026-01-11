@@ -1,7 +1,17 @@
 package ru.practicum.contract.interactionapi.exception.fiegnclient;
 
+import org.springframework.http.HttpStatus;
+
 public class NotFoundException extends RuntimeException {
-    public NotFoundException(String message) {
+
+    private final HttpStatus httpStatus;
+
+    public NotFoundException(String message, HttpStatus httpStatus) {
         super(message);
+        this.httpStatus = httpStatus;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
     }
 }
