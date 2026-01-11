@@ -30,4 +30,14 @@
 
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- Плагин для сборки и запуска Spring Boot -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
