@@ -48,3 +48,21 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+  db-commerce-init:
+    image: postgres:16.1
+    container_name: db-commerce-init
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -e
+        until pg_isready -h postgres-analyzer-db -p 5432 -U analyzer; do sleep 1; done
+        psql postgresql://analyzer:analyzer@postgres-analyzer-db:5432/postgres -v ON_ERROR_STOP=1 <<-EOSQL
+        create database commerce_shopping_cart;
+        create database commerce_shopping_store;
+        create database commerce_warehouse;
+        EOSQL

@@ -1,0 +1,40 @@
+server:
+  port: 8082
+
+kafka:
+  port: localhost:9092
+  topicHub: telemetry.hubs.v1
+  topicSnapShot: telemetry.snapshots.v1
+  consumerClientIdForAnalyzerHubEvent: analyzer-consumer-client-1
+  consumerClientIdForAnalyzerSnapshot: analyzer-consumer-client-2
+  consumerGroupIdForAnalyzer: analyzer-group-1
+
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/analyzer
+    username: analyzer
+    password: analyzer
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    show_sql: true
+  sql:
+    init:
+      mode: always
+
+grpc:
+  client:
+    hub-router:
+      address: static://localhost:59090
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+logging:
+  level:
+    ru:
+      practicum: DEBUG

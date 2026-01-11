@@ -1,0 +1,14 @@
+server:
+  port: 8081
+
+kafka:
+  port: localhost:9092
+  topicSensor: telemetry.sensors.v1
+  topicSnapShot: telemetry.snapshots.v1
+  consumerClientIdForAggregator: aggregator-consumer-client-1
+  consumerGroupIdForAggregator: Aggregator-group-1
+
+logging:
+  level:
+    ru:
+      practicum: DEBUG

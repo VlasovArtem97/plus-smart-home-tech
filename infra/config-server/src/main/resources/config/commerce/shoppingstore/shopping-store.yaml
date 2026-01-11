@@ -1,0 +1,24 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/commerce_shopping_store
+    username: analyzer
+    password: analyzer
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    show_sql: true
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    ru:
+      practicum: DEBUG
