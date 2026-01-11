@@ -35,6 +35,6 @@ public class WarehouseController implements WarehouseOperation {
 
     @Override
     public AddressDto getWarehouseAddress() {
-        return null;
+        return warehouseService.getWarehouseAddress();
     }
 }

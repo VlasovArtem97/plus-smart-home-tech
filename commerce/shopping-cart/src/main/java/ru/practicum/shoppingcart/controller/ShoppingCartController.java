@@ -41,6 +41,6 @@ public class ShoppingCartController implements ShoppingCartOperation {
 
     @Override
     public ShoppingCartDto changeProductQuantity(String userName, ChangeProductQuantityRequest quantityRequest) {
-        return null;
+        return shoppingCartService.changeProductQuantity(userName, quantityRequest);
     }
 }
