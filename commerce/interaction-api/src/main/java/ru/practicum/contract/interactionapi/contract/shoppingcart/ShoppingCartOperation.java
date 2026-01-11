@@ -29,8 +29,7 @@ public interface ShoppingCartOperation {
 
     @PostMapping("/remove")
     ShoppingCartDto removeFromShoppingCart(@RequestParam("username") String userName,
-                                           @Size(min = 1) @NotNull @CheckNegativeValueInMapProduct
-                                           @RequestBody List<UUID> productId);
+                                           @Size(min = 1) @NotNull @RequestBody List<UUID> productId);
 
     @PostMapping("/change-quantity")
     ShoppingCartDto changeProductQuantity(@RequestParam("username") String userName,
