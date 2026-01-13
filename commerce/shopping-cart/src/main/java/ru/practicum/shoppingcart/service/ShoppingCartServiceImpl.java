@@ -186,7 +186,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
         log.debug("Все продукты найдены в корзине покупателя");
     }
-    
+
     private void checkCartState(ShoppingCart shoppingCart) {
         if (shoppingCart.getCartState().equals(CartState.DEACTIVATE)) {
             log.error("Корзина недоступна для изменений: {}", shoppingCart.getCartState());
