@@ -9,7 +9,7 @@ spring:
     password: analyzer
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true

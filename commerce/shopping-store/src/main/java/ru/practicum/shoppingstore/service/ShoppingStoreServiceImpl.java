@@ -84,7 +84,6 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return productMapper.toProductDto(product);
     }
 
-    @Transactional(readOnly = true)
     private Product findProductById(UUID productId) {
         Product product = shoppingStoreRepository.findByProductId(productId).orElseThrow(() -> {
             log.error("По id: {} продукт не найден", productId);

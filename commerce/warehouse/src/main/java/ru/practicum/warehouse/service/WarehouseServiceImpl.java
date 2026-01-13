@@ -80,7 +80,6 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
     private void checkWarehouseProductById(UUID productId) {
         log.info("Осуществляется проверка товара на складе c id {}", productId);
         boolean exists = warehouseRepository.existsByProductId(productId);
@@ -91,7 +90,6 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
     }
 
-    @Transactional(readOnly = true)
     private List<WarehouseProduct> findWarehouseProductByIds(Set<UUID> productIds) {
         log.info("Осуществляется поиск товаров на складе с id: [ {} ]", productIds);
         List<WarehouseProduct> products = warehouseRepository.findByProductIdIn(productIds);

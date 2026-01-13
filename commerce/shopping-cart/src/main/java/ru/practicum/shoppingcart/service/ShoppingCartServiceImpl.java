@@ -127,7 +127,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
     }
 
-    @Transactional(readOnly = true)
     private ShoppingCart findShoppingCartByUserName(String userName) {
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserName(userName).orElseThrow(() -> {
             log.error("Корзина пользователя с именем: [ {} ] отсутствует", userName);
@@ -138,7 +137,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCart;
     }
 
-    @Transactional(readOnly = true)
     private void checkUserName(String userName) {
         if (userName == null || userName.isBlank()) {
             log.error("Отсутствует имя пользователя");
@@ -165,7 +163,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
     }
 
-    @Transactional(readOnly = true)
     private ShoppingCart removeProductFromShoppingCart(ShoppingCart shoppingCart, List<UUID> productId) {
         log.info("Начинается процесс удаление продуктов из корзины");
         checkProductIdFromShoppingCart(shoppingCart.getProducts(), productId);
@@ -174,7 +171,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCart;
     }
 
-    @Transactional(readOnly = true)
     private void checkProductIdFromShoppingCart(Map<UUID, Long> shoppingCart, List<UUID> productId) {
         log.info("Начинается проверка наличия продуктов в корзине покупателя, которые планируются удалить");
         List<String> message = new ArrayList<>();
@@ -190,8 +186,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
         log.debug("Все продукты найдены в корзине покупателя");
     }
-
-    @Transactional(readOnly = true)
+    
     private void checkCartState(ShoppingCart shoppingCart) {
         if (shoppingCart.getCartState().equals(CartState.DEACTIVATE)) {
             log.error("Корзина недоступна для изменений: {}", shoppingCart.getCartState());
