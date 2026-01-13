@@ -13,11 +13,14 @@ public interface ShoppingCartMapper {
     ShoppingCartDto toShoppingCartDtoFromShoppingCart(ShoppingCart shoppingCart);
 
     default ShoppingCartDto toUpdateQuantity(ShoppingCartDto shoppingCartDto, Map<UUID, Long> products) {
-        for (Map.Entry<UUID, Long> sc : shoppingCartDto.getProducts().entrySet()) {
-            UUID id = sc.getKey();
-            Long quantity = sc.getValue();
-            Long plusQuantity = products.getOrDefault(id, 0L);
-            shoppingCartDto.getProducts().put(id, quantity + plusQuantity);
+        Map<UUID, Long> cartProducts = shoppingCartDto.getProducts();
+
+        for (Map.Entry<UUID, Long> entry : products.entrySet()) {
+            UUID id = entry.getKey();
+            Long quantityProduct = entry.getValue();
+
+            cartProducts.compute(id, (k, currentQuantity) ->
+                    (currentQuantity == null ? 0 : currentQuantity) + quantityProduct);
         }
         return shoppingCartDto;
     }
