@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.contract.interactionapi.exception.ApiError;
 import ru.practicum.contract.interactionapi.exception.GlobalErrorHandler;
 
 @Slf4j
+@RestControllerAdvice
 public class ErrorHandler extends GlobalErrorHandler {
 
     @ExceptionHandler(SpecifiedProductAlreadyInWarehouseException.class)
@@ -35,6 +37,15 @@ public class ErrorHandler extends GlobalErrorHandler {
                 e.getMessage());
         return build(HttpStatus.BAD_REQUEST, "Нет информации о товаре на складе.", e.getMessage(),
                 NoSpecifiedProductInWarehouseException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(NoSpecifiedOrderInOrderBookingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleNoSpecifiedOrderInOrderBookingException(NoSpecifiedOrderInOrderBookingException e) {
+        log.error("Ошибка: нет информации о забронированных товаров на складе (NoSpecifiedOrderInOrderBookingException): {}",
+                e.getMessage());
+        return build(HttpStatus.BAD_REQUEST, "Нет информации о забронированных товаров на складе.", e.getMessage(),
+                NoSpecifiedOrderInOrderBookingException.class.getSimpleName());
     }
 
 }

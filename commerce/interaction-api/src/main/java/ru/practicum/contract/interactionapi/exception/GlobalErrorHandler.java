@@ -8,7 +8,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.contract.interactionapi.exception.commerce.IncorrectOrderStateException;
+import ru.practicum.contract.interactionapi.exception.commerce.NoOrderFoundException;
+import ru.practicum.contract.interactionapi.exception.commerce.NotAuthorizedUserException;
+import ru.practicum.contract.interactionapi.exception.commerce.NotEnoughInfoInOrderToCalculateException;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.BadRequestException;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.InternalServerErrorException;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.NotAuthorizedException;
@@ -18,8 +21,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RestControllerAdvice
-public class GlobalErrorHandler {
+public abstract class GlobalErrorHandler {
     protected ApiError build(HttpStatus status, String reason, String message, String errorType) {
         return ApiError.builder()
                 .message(message)
@@ -120,6 +122,38 @@ public class GlobalErrorHandler {
         log.error("Ошибка в обращении через feignClient (NotAuthorizedException): {}", e.getMessage());
         return build(e.getHttpStatus(), "Ошибка в обращении через feignClient", e.getMessage(),
                 NotAuthorizedException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(NotEnoughInfoInOrderToCalculateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleNotEnoughInfoInOrderToCalculateException(NotEnoughInfoInOrderToCalculateException e) {
+        log.error("Ошибка: недостаточно информации (NotEnoughInfoInOrderToCalculateException): {}", e.getMessage());
+        return build(HttpStatus.BAD_REQUEST, "Ошибка: недостаточно информации.", e.getMessage(),
+                NotEnoughInfoInOrderToCalculateException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(NoOrderFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleNoOrderFoundException(NoOrderFoundException e) {
+        log.error("Ошибка: заказ не найден (NoOrderFoundException): {}", e.getMessage());
+        return build(HttpStatus.NOT_FOUND, "Ошибка: заказ не найден.", e.getMessage(),
+                NoOrderFoundException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(IncorrectOrderStateException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleIncorrectOrderStateException(IncorrectOrderStateException e) {
+        log.error("Ошибка: неверный статус заказа (IncorrectOrderStateException): {}", e.getMessage());
+        return build(HttpStatus.NOT_FOUND, "Ошибка: неверный статус заказа.", e.getMessage(),
+                IncorrectOrderStateException.class.getSimpleName());
+    }
+
+    @ExceptionHandler(NotAuthorizedUserException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleNotAuthorizedUserException(NotAuthorizedUserException e) {
+        log.error("Ошибка: имя пользователя не должно быть пустым (SNotAuthorizedUserException): {}", e.getMessage());
+        return build(HttpStatus.BAD_REQUEST, "Ошибка, имя пользователя не должно быть пустым.", e.getMessage(),
+                NotAuthorizedUserException.class.getSimpleName());
     }
 
 }

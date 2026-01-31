@@ -14,6 +14,10 @@ spring:
             - classpath:config/commerce/shoppingstore
             - classpath:config/commerce/shoppingcart
             - classpath:config/commerce/warehouse
+            - classpath:config/infra/gateway
+            - classpath:config/commerce/delivery
+            - classpath:config/commerce/order
+            - classpath:config/commerce/payment
 server:
   port: 8888
 

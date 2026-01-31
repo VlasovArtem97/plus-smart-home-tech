@@ -12,7 +12,10 @@ import ru.practicum.shoppingstore.mapping.ProductMapper;
 import ru.practicum.shoppingstore.model.Product;
 import ru.practicum.shoppingstore.repositiory.ShoppingStoreRepository;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -82,6 +85,40 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         log.info("Получен запрос на поиск товара по id: {}", productId);
         Product product = findProductById(productId);
         return productMapper.toProductDto(product);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ProductDto> getProducts(Set<UUID> products) {
+        log.info("Получен запрос на получение списка продуктов на витрине магазина c id: {}", products);
+        List<Product> prod = shoppingStoreRepository.findByProductIdIn(products);
+        if (prod.isEmpty()) {
+            log.error("Id продуктов не найдены: {}", prod);
+            throw new ProductNotFoundException("Ошибка, товары с id: [ " + products + " ] не найдены");
+        }
+        Set<UUID> productId = prod.stream()
+                .map(Product::getProductId)
+                .collect(Collectors.toSet());
+
+        checkContainProductId(products, productId);
+
+        List<ProductDto> productDtos = prod.stream()
+                .map(productMapper::toProductDto)
+                .toList();
+        log.debug("Найденные продукты: {}", productDtos);
+        return productDtos;
+    }
+
+    private void checkContainProductId(Set<UUID> requestUuid, Set<UUID> responseUuid) {
+        log.info("Начинается проверка на наличие на витрине магазина всех искомых товаров. Переданные id товары: [ {} ]." +
+                "Полученные id с витрины магазина : [ {} ]", requestUuid, responseUuid);
+        Set<UUID> missingUuid = requestUuid.stream()
+                .filter(id -> !responseUuid.contains(id))
+                .collect(Collectors.toSet());
+        if (!missingUuid.isEmpty()) {
+            log.error("Id продуктов, которые не найдены: {}", missingUuid);
+            throw new ProductNotFoundException("Ошибка, товары с id: [ " + missingUuid + " ] не найдены");
+        }
     }
 
     private Product findProductById(UUID productId) {

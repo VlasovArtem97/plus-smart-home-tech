@@ -6,6 +6,8 @@ import ru.practicum.contract.interactionapi.dto.shoppingstore.ProductCategory;
 import ru.practicum.contract.interactionapi.dto.shoppingstore.ProductDto;
 import ru.practicum.contract.interactionapi.dto.shoppingstore.SetProductQuantityStateRequest;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface ShoppingStoreService {
@@ -21,4 +23,6 @@ public interface ShoppingStoreService {
     boolean setProductQuantityState(SetProductQuantityStateRequest request);
 
     ProductDto getProduct(UUID productId);
+
+    List<ProductDto> getProducts(Set<UUID> products);
 }

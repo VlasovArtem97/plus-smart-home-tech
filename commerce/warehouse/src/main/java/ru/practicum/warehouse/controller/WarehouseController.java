@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.contract.interactionapi.contract.warehouse.WarehouseOperation;
+import ru.practicum.contract.interactionapi.dto.delivery.AddressDto;
 import ru.practicum.contract.interactionapi.dto.shoppingcart.ShoppingCartDto;
-import ru.practicum.contract.interactionapi.dto.warehouse.AddProductToWarehouseRequest;
-import ru.practicum.contract.interactionapi.dto.warehouse.AddressDto;
-import ru.practicum.contract.interactionapi.dto.warehouse.BookedProductsDto;
-import ru.practicum.contract.interactionapi.dto.warehouse.NewProductInWarehouseRequest;
+import ru.practicum.contract.interactionapi.dto.warehouse.*;
 import ru.practicum.warehouse.service.WarehouseService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +37,20 @@ public class WarehouseController implements WarehouseOperation {
     @Override
     public AddressDto getWarehouseAddress() {
         return warehouseService.getWarehouseAddress();
+    }
+
+    @Override
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest orderRequest) {
+        return warehouseService.assemblyProductsForOrder(orderRequest);
+    }
+
+    @Override
+    public void acceptReturn(Map<UUID, Long> products, UUID orderId) {
+        warehouseService.acceptReturn(products, orderId);
+    }
+
+    @Override
+    public void shippedToDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest) {
+        warehouseService.shippedToDelivery(shippedToDeliveryRequest);
     }
 }

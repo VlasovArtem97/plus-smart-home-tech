@@ -10,6 +10,8 @@ import ru.practicum.contract.interactionapi.exception.fiegnclient.InternalServer
 import ru.practicum.contract.interactionapi.exception.fiegnclient.NotFoundException;
 import ru.practicum.contract.interactionapi.feignclient.ShoppingStoreClient;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -45,6 +47,11 @@ public class ShoppingStoreFallbackFactory implements FallbackFactory<ShoppingSto
 
             @Override
             public ProductDto getProduct(UUID productId) {
+                throw handleException(cause);
+            }
+
+            @Override
+            public List<ProductDto> getProducts(Set<UUID> products) {
                 throw handleException(cause);
             }
         };
