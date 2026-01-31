@@ -33,51 +33,51 @@ public class OrderController implements OrderOperation {
 
     @Override
     public OrderDto productReturn(ProductReturnRequest productReturnRequest) {
-        return null;
+        return orderService.productReturn(productReturnRequest);
     }
 
     @Override
     public OrderDto payment(UUID orderId) {
-        return null;
+        return orderService.payment(orderId);
     }
 
     @Override
     public OrderDto paymentFailed(UUID orderId) {
-        return null;
+        return orderService.paymentFailed(orderId);
     }
 
     @Override
     public OrderDto delivery(UUID orderId) {
-        return null;
+        return orderService.delivery(orderId);
     }
 
     @Override
     public OrderDto deliveryFailed(UUID orderId) {
-        return null;
+        return orderService.deliveryFailed(orderId);
     }
 
     @Override
     public OrderDto complete(UUID orderId) {
-        return null;
+        return orderService.complete(orderId);
     }
 
     @Override
     public OrderDto calculateTotalCost(UUID orderId) {
-        return null;
+        return orderService.calculateTotalCost(orderId);
     }
 
     @Override
     public OrderDto calculateDeliveryCost(UUID orderId) {
-        return null;
+        return orderService.calculateDeliveryCost(orderId);
     }
 
     @Override
     public OrderDto assembly(UUID orderId) {
-        return null;
+        return orderService.calculateDeliveryCost(orderId);
     }
 
     @Override
     public OrderDto assemblyFailed(UUID orderId) {
-        return null;
+        return orderService.assemblyFailed(orderId);
     }
 }
