@@ -4,19 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.contract.interactionapi.exception.ApiError;
 import ru.practicum.contract.interactionapi.exception.GlobalErrorHandler;
 
+@RestControllerAdvice
 @Slf4j
 public class ErrorHandler extends GlobalErrorHandler {
-
-    @ExceptionHandler(NotAuthorizedUserException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiError handleNotAuthorizedUserException(NotAuthorizedUserException e) {
-        log.error("Ошибка: имя пользователя не должно быть пустым (SNotAuthorizedUserException): {}", e.getMessage());
-        return build(HttpStatus.BAD_REQUEST, "Ошибка, имя пользователя не должно быть пустым.", e.getMessage(),
-                NotAuthorizedUserException.class.getSimpleName());
-    }
 
     @ExceptionHandler(NoProductsInShoppingCartException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

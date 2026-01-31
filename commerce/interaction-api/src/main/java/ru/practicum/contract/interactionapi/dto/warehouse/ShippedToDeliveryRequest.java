@@ -1,23 +1,22 @@
 package ru.practicum.contract.interactionapi.dto.warehouse;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressDto {
+@Builder
+public class ShippedToDeliveryRequest {
 
-    private String country;
+    @NotNull
+    private UUID orderId;
 
-    private String city;
-
-    private String street;
-
-    private String house;
-
-    private String flat;
+    @NotNull
+    private UUID deliveryId;
 }

@@ -1,4 +1,4 @@
-package ru.practicum.shoppingcart.exception;
+package ru.practicum.contract.interactionapi.exception.commerce;
 
 public class NotAuthorizedUserException extends RuntimeException {
     public NotAuthorizedUserException(String message) {

@@ -1,6 +1,7 @@
 package ru.practicum.contract.interactionapi.contract.shoppingcart;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
@@ -22,16 +23,16 @@ public interface ShoppingCartOperation {
     @PutMapping()
     ShoppingCartDto addProductToShoppingCart(@Size(min = 1) @NotNull @CheckNegativeValueInMapProduct
                                              @RequestBody Map<UUID, Long> products,
-                                             @RequestParam("username") String userName);
+                                             @NotBlank @RequestParam("username") String userName);
 
     @DeleteMapping
-    void deactivateCurrentShoppingCart(@RequestParam("username") String userName);
+    void deactivateCurrentShoppingCart(@NotBlank @RequestParam("username") String userName);
 
     @PostMapping("/remove")
-    ShoppingCartDto removeFromShoppingCart(@RequestParam("username") String userName,
+    ShoppingCartDto removeFromShoppingCart(@NotBlank @RequestParam("username") String userName,
                                            @Size(min = 1) @NotNull @RequestBody List<UUID> productId);
 
     @PostMapping("/change-quantity")
-    ShoppingCartDto changeProductQuantity(@RequestParam("username") String userName,
+    ShoppingCartDto changeProductQuantity(@NotBlank @RequestParam("username") String userName,
                                           @Valid @RequestBody ChangeProductQuantityRequest quantityRequest);
 }

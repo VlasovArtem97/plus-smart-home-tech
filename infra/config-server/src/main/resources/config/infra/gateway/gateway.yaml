@@ -1,0 +1,71 @@
+spring:
+  cloud:
+    gateway:
+      # Говорится, что используется discovery
+      discovery:
+        locator:
+          enabled: true
+      # Настройка route(маршруты)
+      route:
+        - id: shopping_cart_service_route
+          uri: lb://shopping-cart
+          predicates:
+            - Path=/shopping-cart/**
+          filters:
+            - PrefixPath=/api/v1
+
+        - id: shopping_store_service_route
+          uri: lb://shopping-store
+          predicates:
+            - Path=/shopping-store/**
+          filters:
+            - PrefixPath=/api/v1
+            - name: Retry
+              arg:
+                retries: 3
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 1s
+                  factor: 2
+                  basedOnPreviousValue: true
+                series: SERVER_ERROR, CLIENT_ERROR
+                statuses: BAD_REQUEST, UNAUTHORIZED, NOT_FOUND, METHOD_NOT_ALLOWED
+                methods: GET, POST, PUT
+                exceptions:
+                  - ru.practicum.shoppingstore.exception.ProductNotFoundException
+
+        - id: warehouse_service_route
+          uri: lb://warehouse
+          predicates:
+            - Path=/warehouse/**
+          filters:
+            - PrefixPath=/api/v1
+
+        - id: order_service_route
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+          filters:
+            - PrefixPath=/api/v1
+
+        - id: payment_service_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - PrefixPath=/api/v1
+
+        - id: delivery_service_route
+          uri: lb://delivery
+          predicates:
+            - Path=/delivery/**
+          filters:
+            - PrefixPath=/api/v1
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+

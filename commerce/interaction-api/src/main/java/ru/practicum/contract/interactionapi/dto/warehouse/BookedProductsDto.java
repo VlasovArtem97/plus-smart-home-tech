@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BookedProductsDto {
 
-
     private double deliveryVolume;
 
     private double deliveryWeight;

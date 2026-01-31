@@ -8,6 +8,8 @@ import ru.practicum.contract.interactionapi.contract.shoppingstore.ShoppingStore
 import ru.practicum.contract.interactionapi.dto.shoppingstore.*;
 import ru.practicum.shoppingstore.service.ShoppingStoreService;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -55,5 +57,10 @@ public class ShoppingStoreController implements ShoppingStoreOperation {
     @Override
     public ProductDto getProduct(UUID productId) {
         return shoppingStore.getProduct(productId);
+    }
+
+    @Override
+    public List<ProductDto> getProducts(Set<UUID> products) {
+        return shoppingStore.getProducts(products);
     }
 }

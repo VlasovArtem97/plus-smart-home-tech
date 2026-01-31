@@ -3,15 +3,16 @@ package ru.practicum.contract.interactionapi.feignclient.fallbackfactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import ru.practicum.contract.interactionapi.dto.delivery.AddressDto;
 import ru.practicum.contract.interactionapi.dto.shoppingcart.ShoppingCartDto;
-import ru.practicum.contract.interactionapi.dto.warehouse.AddProductToWarehouseRequest;
-import ru.practicum.contract.interactionapi.dto.warehouse.AddressDto;
-import ru.practicum.contract.interactionapi.dto.warehouse.BookedProductsDto;
-import ru.practicum.contract.interactionapi.dto.warehouse.NewProductInWarehouseRequest;
+import ru.practicum.contract.interactionapi.dto.warehouse.*;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.BadRequestException;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.InternalServerErrorException;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.NotFoundException;
 import ru.practicum.contract.interactionapi.feignclient.WarehouseClient;
+
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class WarehouseFallbackFactory implements FallbackFactory<WarehouseClient> {
@@ -36,6 +37,21 @@ public class WarehouseFallbackFactory implements FallbackFactory<WarehouseClient
 
             @Override
             public AddressDto getWarehouseAddress() {
+                throw handleException(cause);
+            }
+
+            @Override
+            public void shippedToDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest) {
+                throw handleException(cause);
+            }
+
+            @Override
+            public void acceptReturn(Map<UUID, Long> products, UUID orderId) {
+                throw handleException(cause);
+            }
+
+            @Override
+            public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest orderRequest) {
                 throw handleException(cause);
             }
         };

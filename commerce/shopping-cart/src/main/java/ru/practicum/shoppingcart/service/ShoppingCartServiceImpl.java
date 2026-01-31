@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.contract.interactionapi.dto.shoppingcart.ChangeProductQuantityRequest;
 import ru.practicum.contract.interactionapi.dto.shoppingcart.ShoppingCartDto;
+import ru.practicum.contract.interactionapi.exception.commerce.NotAuthorizedUserException;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.BadRequestException;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.InternalServerErrorException;
 import ru.practicum.contract.interactionapi.exception.fiegnclient.NotAuthorizedException;
@@ -14,7 +15,6 @@ import ru.practicum.contract.interactionapi.exception.fiegnclient.NotFoundExcept
 import ru.practicum.contract.interactionapi.feignclient.WarehouseClient;
 import ru.practicum.shoppingcart.exception.CartStateDeactivateException;
 import ru.practicum.shoppingcart.exception.NoProductsInShoppingCartException;
-import ru.practicum.shoppingcart.exception.NotAuthorizedUserException;
 import ru.practicum.shoppingcart.exception.NotFoundUserException;
 import ru.practicum.shoppingcart.mapper.ShoppingCartMapper;
 import ru.practicum.shoppingcart.model.CartState;
